@@ -5,11 +5,20 @@
 
   var War = {
 
-    init: function (params) {
+    init: function () {
 
       // cache object reference
       _this = this;
-      _this.params = params;
+
+      // keep track of cards
+      _this.board = {
+        dealer: [],
+        player: []
+      };
+
+      _this.cards = [];
+      _this.dealer = [];
+      _this.player = [];
 
       // cache DOM elements
       _this.$dealer = $('.dealer-cards');
@@ -20,62 +29,154 @@
       _this.ranks = ['a', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'j', 'q', 'k'];
       _this.suits = ['c', 'd', 'h', 's'];
 
+      // generate, shuffle, and split a deck
+      _this.generateDeck(5);
+      _this.shuffleDeck(10);
+      _this.splitDeck();
+
       // bind DOM events
       _this.bindDOMEvents();
-
-      // generate cards
-      _this.updateCards();
     },
 
-    bindDOMEvents: function () {
-
-      $('.play-round', _this.$controls)
-        .off('click')
-        .on('click', function (e) {
-          e.preventDefault();
-        });
-    },
-
-    updateCards: function () {
-      _this.makeDecks(_this.params.deck_count);
-      _this.shuffleDecks(_this.params.shuffle_count);
-    },
-
-    makeDecks: function (decks) {
-      _this.cards = [];
-
-      // loop through decks
-      for (var d = 0; d < decks; d++) {
-
-        // loop through ranks
-        for (var r = 0; r < _this.ranks.length; r++) {
-
-          // loop through suits
-          for (var s = 0; s < _this.suits.length; s++) {
-            var card = '' + _this.ranks[r] + _this.suits[s];
+    generateDeck: function (decks) {
+      for (var d = 0; d < decks; d++) { // loop through decks
+        for (var r = 0; r < _this.ranks.length; r++) { // loop through ranks
+          for (var s = 0; s < _this.suits.length; s++) { // loop through suits
+            var card = { rank: _this.ranks[r], suit: _this.suits[s] };
             _this.cards.push(card);
           }
         }
       }
     },
 
-    shuffleDecks: function (shuffles) {
-      var cLength = _this.cards.length;
+    shuffleDeck: function (shuffles, cards) {
+      var deck = cards || _this.cards;
+      var cLength = deck.length;
 
-      // loop through shuffles
-      for (var s = 0; s < shuffles; s++) {
-
-        // loop through cards
-        for (var c = 0; c < cLength; c++) {
-          var card = _this.cards[c];
+      for (var s = 0; s < shuffles; s++) { // loop through shuffles
+        for (var c = 0; c < cLength; c++) { // loop through cards
+          var card = deck[c];
           var r = Math.floor(Math.random() * cLength);
+          deck[c] = deck[r];
+          deck[r] = card;
+        }
+      }
 
-          _this.cards[c] = _this.cards[r];
-          _this.cards[r] = card;
+      return deck;
+    },
+
+    splitDeck: function () {
+      var dealer = false;
+      var player = true;
+
+      for (var i = 0; i < _this.cards.length; i++) {
+
+        if (player) {
+          _this.player.push(_this.cards[i]);
+          dealer = true;
+          player = false;
+        } else {
+          _this.dealer.push(_this.cards[i]);
+          dealer = false;
+          player = true;
         }
       }
     },
+
+    bindDOMEvents: function () {
+
+      $('.play-round', _this.$controls)
+        .off('click')
+        .on('click', function () {
+          _this.playRound();
+        });
+    },
+
+    playRound: function () {
+
+      if (!_this.player.length && _this.dealer.length) {
+        console.log('Player loses!');
+        return;
+      }
+
+      if (!_this.dealer.length && _this.player.length) {
+        console.log('Dealer loses!');
+        return;
+      }
+
+      // output player info
+      var pCard = _this.player.shift();
+      _this.board.player.push(pCard);
+      _this.$player.html(pCard);
+
+      // output dealer info
+      var dCard = _this.dealer.shift();
+      _this.board.dealer.push(dCard);
+      _this.$dealer.html(dCard);
+
+      _this.scoreRound();
+    },
+
+    scoreRound: function (scores) {
+      var dealer = _this.board.dealer.slice(-1)[0];
+      var dScore = _this.getScore(dealer);
+      var player = _this.board.player.slice(-1)[0];
+      var pScore = _this.getScore(player);
+
+      if (scores) {
+        dScore = _this.getScore(scores.dealer);
+        pScore = _this.getScore(scores.player);
+      }
+
+      if (dScore === pScore) {
+        console.log('WAR!!!111!!!');
+        _this.battle();
+        return;
+      }
+
+      var array = _this.board.player.concat(_this.board.dealer);
+
+      if (dScore > pScore) {
+        console.log('Dealer wins!');
+        _this.dealer.concat(_this.shuffleDeck(3, array));
+        return;
+      }
+
+      console.log('Player wins!');
+      _this.player.concat(_this.shuffleDeck(3, array));
+    },
+
+    getScore: function (actor) {
+      var score;
+
+      switch (actor.rank) {
+        case 'a':
+          score = 11;
+          break;
+
+        case 'j':
+        case 'q':
+        case 'k':
+          score = 10;
+          break;
+
+        default:
+          score = actor.rank;
+          break;
+      }
+
+      return score;
+    },
+
+    battle: function () {
+      var scores = {
+        dealer: _this.dealer.splice(0, 4).pop(),
+        player: _this.dealer.splice(0, 4).pop()
+      };
+
+      _this.scoreRound(scores);
+    }
   };
 
-  War.init({ deck_count: 5, shuffle_count: 10 });
+  War.init();
 })();
