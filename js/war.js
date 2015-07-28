@@ -118,10 +118,8 @@
     },
 
     scoreRound: function (scores) {
-      var dealer = _this.board.dealer.slice(-1)[0];
-      var dScore = _this.getScore(dealer);
-      var player = _this.board.player.slice(-1)[0];
-      var pScore = _this.getScore(player);
+      var dScore = _this.getScore(_this.board.dealer.slice(-1)[0]);
+      var pScore = _this.getScore(_this.board.player.slice(-1)[0]);
 
       if (scores) {
         dScore = _this.getScore(scores.dealer);
