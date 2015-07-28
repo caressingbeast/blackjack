@@ -117,16 +117,13 @@
       _this.$dealer.html(_this.$template(dCard));
 
       _this.scoreRound();
+      console.log(_this.dealer.length, _this.player.length);
     },
 
-    scoreRound: function (scores) {
+    scoreRound: function () {
       var dScore = _this.getScore(_this.board.dealer.slice(-1)[0]);
       var pScore = _this.getScore(_this.board.player.slice(-1)[0]);
-
-      if (scores) {
-        dScore = _this.getScore(scores.dealer);
-        pScore = _this.getScore(scores.player);
-      }
+      var winnings = [];
 
       if (dScore === pScore) {
         console.log('WAR!!!111!!!');
@@ -134,16 +131,19 @@
         return;
       }
 
-      var array = _this.board.player.concat(_this.board.dealer);
+      // update winnings and clear the board
+      winnings = winnings.concat(_this.board.player, _this.board.dealer);
+      _this.board.player = [];
+      _this.board.dealer = [];
 
       if (dScore > pScore) {
         _this.$outcome.text('Dealer wins!');
-        _this.dealer.concat(_this.shuffleDeck(3, array));
+        _this.dealer = _this.dealer.concat(winnings);
         return;
       }
 
       _this.$outcome.text('Player wins!');
-      _this.player.concat(_this.shuffleDeck(3, array));
+      _this.player = _this.player.concat(winnings);
     },
 
     getScore: function (actor) {
@@ -169,15 +169,14 @@
     },
 
     battle: function () {
-      var scores = {
-        dealer: _this.dealer.splice(0, 4).pop(),
-        player: _this.dealer.splice(0, 4).pop()
-      };
+      var dealer = _this.dealer.splice(0, 4);
+      var player = _this.dealer.splice(0, 4);
 
-      _this.$player.append(_this.$template(scores.player));
-      _this.$dealer.append(_this.$template(scores.dealer));
+      // update board
+      _this.board.dealer = _this.board.dealer.concat(dealer);
+      _this.board.player = _this.board.player.concat(player);
 
-      _this.scoreRound(scores);
+      _this.scoreRound();
     }
   };
 
