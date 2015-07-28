@@ -11,7 +11,7 @@
       _this = this;
 
       // keep track of cards
-      _this.board = {
+      _this.table = {
         dealer: [],
         player: []
       };
@@ -108,21 +108,20 @@
 
       // output player info
       var pCard = _this.player.shift();
-      _this.board.player.push(pCard);
+      _this.table.player.push(pCard);
       _this.$player.html(_this.$template(pCard));
 
       // output dealer info
       var dCard = _this.dealer.shift();
-      _this.board.dealer.push(dCard);
+      _this.table.dealer.push(dCard);
       _this.$dealer.html(_this.$template(dCard));
 
       _this.scoreRound();
-      console.log(_this.dealer.length, _this.player.length);
     },
 
     scoreRound: function () {
-      var dScore = _this.getScore(_this.board.dealer.slice(-1)[0]);
-      var pScore = _this.getScore(_this.board.player.slice(-1)[0]);
+      var dScore = _this.getScore(_this.table.dealer.slice(-1)[0]);
+      var pScore = _this.getScore(_this.table.player.slice(-1)[0]);
       var winnings = [];
 
       if (dScore === pScore) {
@@ -131,10 +130,10 @@
         return;
       }
 
-      // update winnings and clear the board
-      winnings = winnings.concat(_this.board.player, _this.board.dealer);
-      _this.board.player = [];
-      _this.board.dealer = [];
+      // update winnings and clear the table
+      winnings = winnings.concat(_this.table.player, _this.table.dealer);
+      _this.table.player = [];
+      _this.table.dealer = [];
 
       if (dScore > pScore) {
         _this.$outcome.text('Dealer wins!');
@@ -172,9 +171,9 @@
       var dealer = _this.dealer.splice(0, 4);
       var player = _this.dealer.splice(0, 4);
 
-      // update board
-      _this.board.dealer = _this.board.dealer.concat(dealer);
-      _this.board.player = _this.board.player.concat(player);
+      // update table
+      _this.table.dealer = _this.table.dealer.concat(dealer);
+      _this.table.player = _this.table.player.concat(player);
 
       _this.scoreRound();
     }
