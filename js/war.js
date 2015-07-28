@@ -21,9 +21,11 @@
       _this.player = [];
 
       // cache DOM elements
-      _this.$dealer = $('.dealer-cards');
-      _this.$player = $('.player-cards');
+      _this.$outcome = $('.outcome');
+      _this.$dealer = $('.dealer-cards .dealt-cards');
+      _this.$player = $('.player-cards .dealt-cards');
       _this.$controls = $('.player-controls');
+      _this.$template = Handlebars.compile($('#card-tmpl').html());
 
       // set up cards
       _this.ranks = ['a', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'j', 'q', 'k'];
@@ -73,12 +75,12 @@
 
         if (player) {
           _this.player.push(_this.cards[i]);
-          dealer = true;
-          player = false;
+          dealer = !dealer;
+          player = !player;
         } else {
           _this.dealer.push(_this.cards[i]);
-          dealer = false;
-          player = true;
+          dealer = !dealer;
+          player = !player;
         }
       }
     },
@@ -107,12 +109,12 @@
       // output player info
       var pCard = _this.player.shift();
       _this.board.player.push(pCard);
-      _this.$player.html(pCard);
+      _this.$player.html(_this.$template(pCard));
 
       // output dealer info
       var dCard = _this.dealer.shift();
       _this.board.dealer.push(dCard);
-      _this.$dealer.html(dCard);
+      _this.$dealer.html(_this.$template(dCard));
 
       _this.scoreRound();
     },
@@ -135,12 +137,12 @@
       var array = _this.board.player.concat(_this.board.dealer);
 
       if (dScore > pScore) {
-        console.log('Dealer wins!');
+        _this.$outcome.text('Dealer wins!');
         _this.dealer.concat(_this.shuffleDeck(3, array));
         return;
       }
 
-      console.log('Player wins!');
+      _this.$outcome.text('Player wins!');
       _this.player.concat(_this.shuffleDeck(3, array));
     },
 
@@ -171,6 +173,9 @@
         dealer: _this.dealer.splice(0, 4).pop(),
         player: _this.dealer.splice(0, 4).pop()
       };
+
+      _this.$player.append(_this.$template(scores.player));
+      _this.$dealer.append(_this.$template(scores.dealer));
 
       _this.scoreRound(scores);
     }
