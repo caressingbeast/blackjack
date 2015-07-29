@@ -24,17 +24,26 @@
       _this.$outcome = $('.outcome');
       _this.$dealer = $('.dealer-cards .dealt-cards');
       _this.$player = $('.player-cards .dealt-cards');
-      _this.$controls = $('.player-controls');
+      _this.$dealerCount = $('.dealer-cards .card-count');
+      _this.$playerCount = $('.player-cards .card-count');
+      _this.$controls = $('.directions');
       _this.$template = Handlebars.compile($('#card-tmpl').html());
+      _this.$warTemplate = Handlebars.compile($('#battle-tmpl').html());
 
       // set up cards
       _this.ranks = ['a', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'j', 'q', 'k'];
       _this.suits = ['c', 'd', 'h', 's'];
 
       // generate, shuffle, and split a deck
-      _this.generateDeck(5);
+      _this.generateDeck(1);
       _this.shuffleDeck(10);
       _this.splitDeck();
+
+      // DOM stuff
+      $('.table').show();
+      _this.$controls.find('.start-game').replaceWith('<button class="button play-round">Flip!</button>');
+      _this.$dealerCount.text(_this.dealer.length);
+      _this.$playerCount.text(_this.player.length);
 
       // bind DOM events
       _this.bindDOMEvents();
@@ -51,20 +60,17 @@
       }
     },
 
-    shuffleDeck: function (shuffles, cards) {
-      var deck = cards || _this.cards;
-      var cLength = deck.length;
+    shuffleDeck: function (shuffles) {
+      var cLength = _this.cards.length;
 
       for (var s = 0; s < shuffles; s++) { // loop through shuffles
         for (var c = 0; c < cLength; c++) { // loop through cards
-          var card = deck[c];
+          var card = _this.cards[c];
           var r = Math.floor(Math.random() * cLength);
-          deck[c] = deck[r];
-          deck[r] = card;
+          _this.cards[c] = _this.cards[r];
+          _this.cards[r] = card;
         }
       }
-
-      return deck;
     },
 
     splitDeck: function () {
@@ -97,7 +103,7 @@
     playRound: function () {
 
       if (!_this.player.length && _this.dealer.length) {
-        console.log('Player loses!');
+        console.log('You lose!');
         return;
       }
 
@@ -109,11 +115,13 @@
       // output player info
       var pCard = _this.player.shift();
       _this.table.player.push(pCard);
+      _this.$playerCount.text(_this.player.length);
       _this.$player.html(_this.$template(pCard));
 
       // output dealer info
       var dCard = _this.dealer.shift();
       _this.table.dealer.push(dCard);
+      _this.$dealerCount.text(_this.dealer.length);
       _this.$dealer.html(_this.$template(dCard));
 
       _this.scoreRound();
@@ -125,24 +133,24 @@
       var winnings = [];
 
       if (dScore === pScore) {
-        console.log('WAR!!!111!!!');
+        _this.$outcome.text('WAR!!!111!!!');
         _this.battle();
         return;
       }
 
       // update winnings and clear the table
-      winnings = winnings.concat(_this.table.player, _this.table.dealer);
+      winnings = $.merge(_this.table.player, _this.table.dealer);
       _this.table.player = [];
       _this.table.dealer = [];
 
       if (dScore > pScore) {
-        _this.$outcome.text('Dealer wins!');
-        _this.dealer = _this.dealer.concat(winnings);
+        _this.$outcome.text('Dealer won!');
+        _this.dealer = $.merge(_this.dealer, winnings);
         return;
       }
 
-      _this.$outcome.text('Player wins!');
-      _this.player = _this.player.concat(winnings);
+      _this.$outcome.text('You won!');
+      _this.player = $.merge(_this.player, winnings);
     },
 
     getScore: function (actor) {
@@ -169,15 +177,19 @@
 
     battle: function () {
       var dealer = _this.dealer.splice(0, 4);
-      var player = _this.dealer.splice(0, 4);
+      var player = _this.player.splice(0, 4);
 
-      // update table
-      _this.table.dealer = _this.table.dealer.concat(dealer);
-      _this.table.player = _this.table.player.concat(player);
+      _this.table.dealer = $.merge(_this.table.dealer, dealer);
+      _this.table.player = $.merge(_this.table.player, player);
+
+      _this.$dealer.append(_this.$warTemplate(dealer.slice(-1)[0]));
+      _this.$player.append(_this.$warTemplate(player.slice(-1)[0]));
 
       _this.scoreRound();
     }
   };
 
-  War.init();
+  $(document).on('click', '.start-game', function () {
+    War.init();
+  });
 })();

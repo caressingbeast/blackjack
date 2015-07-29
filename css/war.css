@@ -117,3 +117,66 @@ a:hover {
 small {
   font-size: 12px;
 }
+
+.table {
+  display: none;
+  margin: 50px auto 0;
+  width: 600px;
+}
+
+.hand {
+  overflow: hidden;
+}
+
+.remaining-cards {
+  float: left;
+}
+
+.dealt-cards {
+  float: left;
+}
+
+.card-group {
+  float: left;
+  height: 111px;
+  position: relative;
+  margin: 0 0 0 20px;
+}
+
+.middle {
+  position: absolute; top: 5px; left: 5px;
+}
+
+.top {
+  position: absolute; top: 10px; left: 10px;
+}
+
+.card {
+  width: 71px; height: 96px;
+}
+
+.card-back {
+  background: url(../assets/b2fv.png) center no-repeat;
+}
+
+.face-card {
+  position: absolute; top: 15px; left: 15px;
+}
+
+.dealer-cards {
+  margin: 0 0 30px 0;
+}
+
+h2 {
+  margin: 0 0 10px 0; padding: 0;
+}
+
+.card-count {
+  display: block;
+  text-align: center;
+}
+
+.directions {
+  margin: 20px auto 0;
+  width: 600px;
+}

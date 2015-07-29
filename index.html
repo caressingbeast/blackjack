@@ -6,20 +6,45 @@
 	</head>
 	<body>
 		<div class="outcome"></div>
-		<div class="dealer-cards">
-			<div class="remaining-cards"></div>
-			<div class="dealt-cards"></div>
+		<div class="table">
+			<div class="dealer-cards">
+				<h2>Dealer</h2>
+				<div class="hand">
+					<div class="remaining-cards">
+						<div class="card card-back"></div>
+						<span class="card-count">{{remaining}}<span>
+					</div>
+					<div class="dealt-cards"></div>
+				</div>
+			</div>
+			<div class="player-cards">
+				<h2>You</h2>
+				<div class="hand">
+					<div class="remaining-cards">
+						<div class="card card-back"></div>
+						<span class="card-count">{{remaining}}<span>
+					</div>
+					<div class="dealt-cards"></div>
+				</div>
+			</div>
 		</div>
-		<div class="player-cards">
-			<div class="remaining-cards"></div>
-			<div class="dealt-cards"></div>
-		</div>
-		<div class="player-controls">
-			<a class="play-round" href="#">Play Round</a>
+		<div class="directions">
+			<button class="button button-success start-game">Start Game</button>
 		</div>
 
 		<script id="card-tmpl" type="text/x-handlebars-template">
-			<div>{{this.rank}}{{this.suit}}</div>
+			<div class="card-group">
+				<div class="card"><img src="assets/{{rank}}{{suit}}.png" alt="{{rank}}{{suit}}" /></div>
+			</div>
+		</script>
+
+		<script id="battle-tmpl" type="text/x-handlebars-template">
+			<div class="card-group">
+				<div class="card card-back bottom"></div>
+				<div class="card card-back middle"></div>
+				<div class="card card-back top"></div>
+				<div class="card face-card"><img src="assets/{{rank}}{{suit}}.png" alt="{{rank}}{{suit}}" /></div>
+			</div>
 		</script>
 	</body>
 	<script src="lib/jquery-v2.1.4-min.js" type="text/javascript"></script>
