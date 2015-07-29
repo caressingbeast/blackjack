@@ -5,7 +5,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
+
 		<div class="outcome"></div>
+
 		<div class="table">
 			<div class="dealer-cards">
 				<h2>Dealer</h2>
@@ -28,8 +30,14 @@
 				</div>
 			</div>
 		</div>
+
 		<div class="directions">
-			<button class="button button-success start-game">Start Game</button>
+			<button class="button button-success start-game">Start game</button>
+			<div class="hidden-btns">
+				<button class="button play-round">Play!</button>
+				<button class="button clear-table" disabled>Clear table</button>
+				<button class="button begin-battle" disabled>Attack!</button>
+			</div>
 		</div>
 
 		<script id="card-tmpl" type="text/x-handlebars-template">

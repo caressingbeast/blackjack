@@ -118,6 +118,16 @@ small {
   font-size: 12px;
 }
 
+.outcome {
+  background: #e3f8ff;
+  display: none;
+  margin: 0 0 0 -150px;
+  position: absolute; top: 100px; left: 50%;
+  width: 300px;
+  z-index: 100;
+  color: #00b0e9; font-size: 21px; line-height: 50px; text-align: center;
+}
+
 .table {
   display: none;
   margin: 50px auto 0;
@@ -179,4 +189,13 @@ h2 {
 .directions {
   margin: 20px auto 0;
   width: 600px;
+  text-align: center;
+}
+
+.directions button {
+  margin: 0 3px;
+}
+
+.hidden-btns {
+  display: none;
 }

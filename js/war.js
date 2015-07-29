@@ -9,6 +9,7 @@
 
       // cache object reference
       _this = this;
+      _this.timeout;
 
       // keep track of cards
       _this.table = {
@@ -41,9 +42,9 @@
 
       // DOM stuff
       $('.table').show();
-      _this.$controls.find('.start-game').replaceWith('<button class="button play-round">Flip!</button>');
-      _this.$dealerCount.text(_this.dealer.length);
-      _this.$playerCount.text(_this.player.length);
+      _this.$controls.find('.start-game').hide();
+      _this.$controls.find('.hidden-btns').show();
+      _this.updateRemainingCount();
 
       // bind DOM events
       _this.bindDOMEvents();
@@ -91,6 +92,11 @@
       }
     },
 
+    updateRemainingCount: function () {
+      _this.$dealerCount.text(_this.dealer.length);
+      _this.$playerCount.text(_this.player.length);
+    },
+
     bindDOMEvents: function () {
 
       $('.play-round', _this.$controls)
@@ -98,32 +104,36 @@
         .on('click', function () {
           _this.playRound();
         });
+
+      $('.clear-table', _this.$controls)
+        .off('click')
+        .on('click', function () {
+          _this.clearTable();
+        });
+
+      $('.begin-battle', _this.$controls)
+        .off('click')
+        .on('click', function () {
+          _this.battle();
+        });
     },
 
     playRound: function () {
 
-      if (!_this.player.length && _this.dealer.length) {
-        console.log('You lose!');
-        return;
-      }
-
-      if (!_this.dealer.length && _this.player.length) {
-        console.log('Dealer loses!');
-        return;
-      }
+      // output dealer info
+      var dCard = _this.dealer.shift();
+      _this.table.dealer.push(dCard);
+      _this.$dealer.html(_this.$template(dCard));
 
       // output player info
       var pCard = _this.player.shift();
       _this.table.player.push(pCard);
-      _this.$playerCount.text(_this.player.length);
       _this.$player.html(_this.$template(pCard));
 
-      // output dealer info
-      var dCard = _this.dealer.shift();
-      _this.table.dealer.push(dCard);
-      _this.$dealerCount.text(_this.dealer.length);
-      _this.$dealer.html(_this.$template(dCard));
+      // update remaining card count
+      _this.updateRemainingCount();
 
+      // score round
       _this.scoreRound();
     },
 
@@ -133,24 +143,23 @@
       var winnings = [];
 
       if (dScore === pScore) {
-        _this.$outcome.text('WAR!!!111!!!');
-        _this.battle();
+        _this.flashOutcome('WAR!!!111!!!');
+        _this.updateActiveButtons(2);
         return;
       }
 
-      // update winnings and clear the table
+      // update winnings
       winnings = $.merge(_this.table.player, _this.table.dealer);
-      _this.table.player = [];
-      _this.table.dealer = [];
 
       if (dScore > pScore) {
-        _this.$outcome.text('Dealer won!');
         _this.dealer = $.merge(_this.dealer, winnings);
-        return;
+        _this.flashOutcome('Dealer won!');
+      } else {
+        _this.player = $.merge(_this.player, winnings);
+        _this.flashOutcome('You won!');
       }
 
-      _this.$outcome.text('You won!');
-      _this.player = $.merge(_this.player, winnings);
+      _this.updateActiveButtons(1);
     },
 
     getScore: function (actor) {
@@ -179,13 +188,54 @@
       var dealer = _this.dealer.splice(0, 4);
       var player = _this.player.splice(0, 4);
 
+      // merge cards into table cards
       _this.table.dealer = $.merge(_this.table.dealer, dealer);
       _this.table.player = $.merge(_this.table.player, player);
 
+      // show cards
       _this.$dealer.append(_this.$warTemplate(dealer.slice(-1)[0]));
       _this.$player.append(_this.$warTemplate(player.slice(-1)[0]));
 
+      // update remaining card count
+      _this.updateRemainingCount();
+
+      // score round
       _this.scoreRound();
+    },
+
+    updateActiveButtons: function (index) {
+      var buttons = [
+        _this.$controls.find('.play-round'),
+        _this.$controls.find('.clear-table'),
+        _this.$controls.find('.begin-battle')
+      ];
+
+      _this.$controls.find('button').attr('disabled', true);
+      buttons[index].removeAttr('disabled');
+    },
+
+    flashOutcome: function (outcome) {
+      _this.$outcome.text(outcome).show().stop(true, true);
+      _this.$outcome.fadeOut(1500, function () {
+        _this.$outcome.hide();
+      });
+    },
+
+    clearTable: function () {
+
+      // clear table arrays
+      _this.table.dealer = [];
+      _this.table.player = [];
+
+      // clear DOM
+      _this.$dealer.empty();
+      _this.$player.empty();
+
+      // update remaining card count
+      _this.updateRemainingCount();
+
+      // update buttons
+      _this.updateActiveButtons(0);
     }
   };
 
