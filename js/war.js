@@ -216,7 +216,7 @@
 
     flashOutcome: function (outcome) {
       _this.$outcome.text(outcome).show().stop(true, true);
-      _this.$outcome.fadeOut(1500, function () {
+      _this.$outcome.fadeOut(2000, function () {
         _this.$outcome.hide();
       });
     },
